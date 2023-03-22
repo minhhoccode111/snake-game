@@ -40,3 +40,6 @@ body {
 .scoreP1 {
   display: inline;
 }
+.sqr {
+  border-radius: 50%;
+}

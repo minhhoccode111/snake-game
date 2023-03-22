@@ -38,6 +38,7 @@ class App {
       //set its attribute data-x = x
       div.setAttribute("data-y", y);
       //set its attribute data-y = y
+      div.setAttribute("class", "sqr");
       pg.appendChild(div);
       //then append
       x++;
@@ -50,28 +51,112 @@ class App {
     scoreP1.innerHTML = this.#point;
     return this;
   }
+  increaseScore() {
+    this.#point++;
+    return this;
+  }
 }
 
 class Snake {
   #currentDirection;
-  #changeDirection = [];
+  #changedDirection;
+  #headPosition;
   #body;
   #length;
   #speed;
-  constructor(currentDirection = "", speed = 10, body = [0]) {
+  #color;
+  #moveKeys;
+  constructor(
+    currentDirection = "",
+    speed = 10,
+    body = [0],
+    color = "red",
+    headPosition = { x: 10, y: 10 },
+    moveKeys = ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"]
+  ) {
     this.#currentDirection = currentDirection;
+    //currentDirection to specify which direction snake's head is moving
+    this.#changedDirection = [];
+    //mark every time head change direction
+    this.#headPosition = headPosition;
+    //init head position on board
     this.#body = body;
+    // init with [0] and push another 0 every time snake eat food
     this.#length = body.length;
+    //length of body
     this.#speed = 110 - speed;
+    //we will use setInterval to display snake position after the amount of time
+    this.#color = color;
+    this.#moveKeys = moveKeys;
   }
-  getCurrentD() {
+  getCD = function getCurrentHeadDirection() {
+    //method to get current head direction
     return this.#currentDirection;
-  }
-  setCurrentD(newD) {
+  };
+  setCD = function setCurrentHeadDirection(newD) {
+    //method to set current head direction, it takes 1 argument
     this.#currentDirection = newD;
+    //takes 1 argument and assign it to #currentDirection property
+    //this.#changedDirection note down a list of each time snake's head changed direction
+    this.#changedDirection.unshift({
+      //then we will add an object from the beginning of #changedDirection array
+      d: this.#currentDirection,
+      //object has a d: property to mark direction that head changed
+      ...this.#headPosition,
+      //and has x: and y: to mark position when head changed direction
+    });
+    if (this.#changedDirection.length > this.#length) {
+      //if changedDirection history length greater than the snake's length
+      this.#changedDirection.pop();
+      //then we remove changedDirection last mark
+    }
+    return this;
+    //return this to chain methods
+  };
+  spawnHead() {
+    const sqr = document.querySelector(
+      `[data-x='${this.#headPosition["x"]}'][data-y='${
+        this.#headPosition["y"]
+      }']`
+      //select a square (default is x:10, y;10)
+    );
+    sqr.style.backgroundColor = this.#color;
+    //and make that a head by giving it a red background color
+    return this;
   }
+  move = function moveAlongWithHeadDirection() {
+    const thisCD = this.getCD();
+    this.#moveKeys.forEach((el) => {
+      if (el === thisCD) {
+        console.log(el);
+        console.dir(this.#changedDirection);
+      }
+    });
+    // if (thisCD.includes("Up")) {
+    //   console.log("Moving up");
+    // }
+    // if (thisCD.includes("Down")) {
+    //   console.log("Moving down");
+    // }
+    // if (thisCD.includes("Left")) {
+    //   console.log("Moving left");
+    // }
+    // if (thisCD.includes("Right")) {
+    //   console.log("Moving right");
+    // }
+    return this;
+  };
 }
 
 const app = new App();
 app.setGridTemplate().createGridDivs().displayScore();
 const snake = new Snake();
+snake.spawnHead();
+window.addEventListener("keydown", handleKeyDown);
+function handleKeyDown(e) {
+  const keys = ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"];
+  const currentD = snake.getCD();
+  if (keys.some((el) => el === e.key) && e.key != currentD) {
+    snake.setCD(e.key).move();
+  }
+}
