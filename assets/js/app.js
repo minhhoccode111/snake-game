@@ -57,47 +57,17 @@ class App {
   }
 }
 
-class Snake {
-  #currentDirection;
-  #changedDirection;
-  #partPosition;
-  #body;
-  #length;
-  #speed;
-  #color;
-  #moveKeys;
-  constructor(
-    currentDirection = "",
-    speed = 10,
-    body = [],
-    color = "red",
-    partPosition = { x: 10, y: 10 },
-    moveKeys = ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"]
-  ) {
-    this.#currentDirection = currentDirection;
-    //currentDirection to specify which direction snake's head is moving
-    this.#changedDirection = [];
-    //mark every time head change direction
-    this.#partPosition = partPosition;
-    //init head position on board
-    this.#body = body;
-    // init with 4 part of body and push another position every time snake eat food
-    this.#speed = 110 - speed;
-    //we will use setInterval to display snake position after the amount of time
-    this.#color = color;
-    this.#moveKeys = moveKeys;
-  }
-}
+class Snake {}
 
 const app = new App();
 app.setGridTemplate().createGridDivs().displayScore();
 const snake = new Snake();
-snake.spawnPart();
+// snake.spawnPart();
 window.addEventListener("keydown", handleKeyDown);
 function handleKeyDown(e) {
   const keys = ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"];
-  const currentD = snake.getPD();
-  if (keys.some((el) => el === e.key) && e.key != currentD) {
-    snake.setPD(e.key).move();
-  }
+  // const currentD = snake.getPD();
+  // if (keys.some((el) => el === e.key) && e.key != currentD) {
+  //   snake.setPD(e.key).move();
+  // }
 }
