@@ -79,6 +79,8 @@ const snake = (() => {
     direction.y = obj.y;
   };
 
+  const grow = () => (cellsToGrow += growRate);
+
   // movable direction is not current direction and not opposite to current direction
   const movableDirection = (obj) => {
     // if current direction is left or right {x:-1,y:0}, {x:1,y:0}
@@ -103,14 +105,21 @@ const snake = (() => {
 
   const getHead = () => body[0];
 
-  const isOnHead = (obj) => getHead().x === obj.x && getHead().y === obj.y;
+  const isOnHead = (obj) => getHead().getX() === obj.getX() && getHead().getY() === obj.getY();
 
   const move = () => {
-    // take last cell
-    const last = body.pop();
     // move it ahead of snake's head base on current direction to make it moving
     const aheadX = getHead().getX() + direction.x;
     const aheadY = getHead().getY() + direction.y;
+    //if we have cells to grow then we grow before moving
+    if (cellsToGrow > 0) {
+      const newCell = Cell(aheadX, aheadY, 'snake');
+      body.unshift(newCell);
+      cellsToGrow--;
+      return;
+    }
+    // take last cell
+    const last = body.pop();
     // change cell's position
     last.change(aheadX, aheadY);
     // make last cell to be first cell in body array
@@ -119,6 +128,7 @@ const snake = (() => {
 
   return {
     move,
+    grow,
     getHead,
     isOnHead,
     isOnBody,
@@ -136,10 +146,10 @@ const food = (() => {
     //TODO FIXME implement spawn food
   };
 
-  const get = () => position;
+  const getPosition = () => position;
 
   return {
-    get,
+    getPosition,
     change,
   };
 })();
@@ -150,8 +160,16 @@ const game = (() => {
 
     function snakeMove() {
       snake.move();
+      // check game ended
       if (grid.checkOutside(snake.getHead()) || snake.isOnBody(snake.getHead())) {
         clearInterval(moving);
+        if (window.confirm('Play again?')) {
+          window.location.href = '/';
+        }
+      }
+      // check snake eat food
+      if (snake.isOnHead(food.getPosition())) {
+        snake.grow();
       }
     }
   };
@@ -177,6 +195,6 @@ const listener = (() => {
 
   window.addEventListener('DOMContentLoaded', (e) => {
     grid.display();
-    // game.start();
+    game.start();
   });
 })();
