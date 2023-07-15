@@ -62,9 +62,9 @@ const grid = (() => {
 })();
 
 const snake = (() => {
-  let speed = 100; // ms refresh frame
-  let speedExtra = 245; // 750ms - 25ms each time snake eat
-  let growRate = 2; // + 1 Cell each time snake eat
+  let speed = 30; // update snake after 30 frames
+  let speedExtra = 1; // 30 frames - 1 frame each time snake eat
+  let growRate = 1; // + 1 Cell each time snake eat
   let cellsToGrow = 0; //while this === 0, the snake can move, while this !== 0, the snake grows instead of moving (but grow ahead of snake's head so it still look like moving) and each time the snake grow cellsToGrow--
 
   let direction = { x: 1, y: 0 }; // init move right
@@ -173,34 +173,36 @@ const food = (() => {
 })();
 
 const game = (() => {
-  const start = () => {
-    // game start then snake start moving
-    const moving = setInterval(snakeMove, snake.getSpeed());
+  let frame = 0;
 
-    function snakeMove() {
+  const gameLoop = (timestamp) => {
+    frame++;
+    if (frame === snake.getSpeed()) {
       snake.move();
-      // check game ended when snake's head outside of grid
-      // or snake's head is on its body
+
       if (grid.checkOutside(snake.getHead()) || snake.isOnBody(snake.getHead())) {
-        // then clear interval
-        clearInterval(moving);
-        // ask to play again
         if (window.confirm('Play again?')) {
-          // if yes then reload
           window.location.href = '/';
         }
       }
-      // check if snake eat food
       if (snake.isOnHead(food.getPosition())) {
-        // then snake grow
         snake.grow();
-        // spawn food on new position
         food.change();
       }
+
+      frame = 0;
     }
+    requestAnimationFrame(gameLoop);
   };
 
-  return { start };
+  const start = () => {
+    requestAnimationFrame(gameLoop);
+  };
+
+  return {
+    start,
+    gameLoop,
+  };
 })();
 
 // event listeners
