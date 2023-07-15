@@ -1,4 +1,3 @@
-// console.log('Hello, World! From app.js');
 const board = document.getElementById('game-board');
 
 const Cell = (xAxis, yAxis, type) => {
@@ -112,13 +111,10 @@ const snake = (() => {
     // move it ahead of snake's head base on current direction to make it moving
     const aheadX = getHead().getX() + direction.x;
     const aheadY = getHead().getY() + direction.y;
-    console.log(aheadX);
-    console.log(aheadY);
     // change cell's position
     last.change(aheadX, aheadY);
     // make last cell to be first cell in body array
     body.unshift(last);
-    console.log('moving');
   };
 
   return {
@@ -136,28 +132,31 @@ const snake = (() => {
 const food = (() => {
   let position = Cell(15, 15, 'food');
 
-  const change = (obj) => {
-    position.change(obj.x, obj.y);
+  const change = () => {
+    //TODO FIXME implement spawn food
   };
 
+  const get = () => position;
+
   return {
+    get,
     change,
   };
 })();
 
 const game = (() => {
-  const moving = setInterval(snakeMove, snake.getSpeed());
+  const start = () => {
+    const moving = setInterval(snakeMove, snake.getSpeed());
 
-  function snakeMove() {
-    snake.move();
-    console.log('game not end');
-    if (grid.checkOutside(snake.getHead()) || snake.isOnBody(snake.getHead())) {
-      clearInterval(moving);
-      console.log('game end');
+    function snakeMove() {
+      snake.move();
+      if (grid.checkOutside(snake.getHead()) || snake.isOnBody(snake.getHead())) {
+        clearInterval(moving);
+      }
     }
-  }
+  };
 
-  return {};
+  return { start };
 })();
 
 const listener = (() => {
