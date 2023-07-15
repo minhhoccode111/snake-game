@@ -1,5 +1,25 @@
 // console.log('Hello, World! From app.js');
 
+const board = document.getElementById('game-board');
+
+const Cell = (x, y, type) => {
+  const div = document.createElement('div');
+  div.className = type; // snake or food
+  div.style.gridArea = `${x}/${y}/${x + 1}/${y + 1}`;
+  board.appendChild(div);
+
+  const change = (newX, newY) => {
+    x = newX;
+    y = newY;
+    div.style.gridArea = `${x}/${y}/${x + 1}/${y + 1}`;
+  };
+
+  return {
+    x,
+    y,
+  };
+};
+
 // const display = (() => {
 //   const food = (f) => {};
 //   const snake = (s) => {};
@@ -10,112 +30,96 @@
 //   };
 // })();
 
-// const inputs = (() => {
-//   let direction = { x: 0, y: 0 };
+const grid = (() => {
+  let size = 21;
 
-//   const letters = {
-//     a: { x: -1, y: 0 },
-//     s: { x: 0, y: -1 },
-//     d: { x: 1, y: 0 },
-//     w: { x: 0, y: 1 },
-//   };
+  const getSize = () => size;
 
-//   window.addEventListener('keyup', (e) => {
-//     if (Object.keys(letters).includes(e.key)) {
-//       console.log(direction);
-//       direction = letters[e.key];
-//     }
-//   });
-// })();
+  const setSize = (v) => (size = v);
 
-// const food = (() => {
-//   let position = {
-//     x: 15,
-//     y: 15,
-//   };
-// })();
-
-// const snake = (() => {
-//   let position = [
-//     { x: 10, y: 10 },
-//     { x: 10, y: 9 },
-//     { x: 10, y: 8 },
-//   ];
-
-//   const head = () => position[0];
-
-//   return {
-//     head,
-//   };
-// })();
-
-// const grid = (() => {
-//   const board = document.getElementById('game-board');
-// })();
-
-// const game = (() => {})();
-
-(() => {
-  const board = document.getElementById('game-board');
-  let direction = {
-    x: 1,
-    y: 0,
+  const checkOutside = (obj) => {
+    return obj.x > size || obj.y > size || obj.x < 1 || obj.y < 1;
   };
 
-  let lastDirection;
+  const randomPosition = () => ({
+    x: Math.floor(Math.random() * size) + 1,
+    y: Math.floor(Math.random() * size) + 1,
+  });
+
+  return {
+    getSize,
+    setSize,
+    checkOutside,
+    randomPosition,
+  };
+})();
+
+const snake = (() => {
+  let speed = 1000; // ms refresh frame
+  let speedExtra = 5; // 1000ms - 5ms each time snake eat
+  let growRate = 1; // + 1 Cell each time snake eat
+  let cellsToGrow = 0; //while this === 0, the snake can move, while this !== 0, the snake grows instead of moving and each time the snake grow cellsToGrow--
+  // when the snake eat something, cellsToGrow += growRate
+
+  let direction = { x: 1, y: 0 };
 
   const getDirection = () => direction;
 
-  let gameEnd = false;
-  let position = [
-    { x: 4, y: 9 },
-    { x: 4, y: 8 },
-    { x: 4, y: 7 },
-  ];
-  const div = document.createElement('div');
-  div.className = 'snake';
-
-  div.style.gridArea = `${position.y}/${position.x}/${position.y + 1}/${position.x + 1}`;
-
-  board.appendChild(div);
-
-  const move = () => {
-    let d = getDirection();
-    position.x += d.x;
-    position.y += d.y;
-
-    if (position.x > 21 || position.x < 1 || position.y < 1 || position.x > 21) {
-      gameEnd = true;
-    }
-
-    if (gameEnd) {
-      alert(`You've lost!`);
-      return;
-    }
-
-    div.style.gridArea = `${position.y}/${position.x}/${position.y + 1}/${position.x + 1}`;
-
-    setTimeout(() => {
-      move();
-    }, 300);
+  const setDirection = (obj) => {
+    direction.x = obj.x;
+    direction.y = obj.y;
   };
 
-  move();
+  // movable direction is not current direction and not opposite to current direction
+  const movableDirection = (obj) => {
+    if (obj.x === direction.x && obj.y !== direction.y) return true;
+    if (obj.y === direction.y && obj.x !== direction.x) return true;
+    return false;
+  };
 
+  const body = [Cell(10, 10, 'snake'), Cell(10, 9, 'snake'), Cell(10, 8, 'snake')];
+
+  const isOnBody = (obj) => {};
+
+  const getHead = () => body[0];
+
+  const isOnHead = (obj) => getHead().x === obj.x && getHead().y === obj.y;
+
+  return {
+    getHead,
+    isOnHead,
+    isOnBody,
+    getDirection,
+    setDirection,
+    movableDirection,
+  };
+})();
+
+const food = (() => {
+  let position = Cell(15, 15, 'food');
+
+  const change = (obj) => {
+    position.change(obj.x, obj.y);
+  };
+
+  return {
+    change,
+  };
+})();
+
+const game = (() => {})();
+
+const listener = (() => {
   const letters = {
-    a: { x: -1, y: 0 },
-    s: { x: 0, y: 1 },
-    d: { x: 1, y: 0 },
-    w: { x: 0, y: -1 },
+    ArrowUp: { x: 0, y: 1 },
+    ArrowLeft: { x: -1, y: 0 },
+    ArrowDown: { x: 0, y: -1 },
+    ArrowRight: { x: 1, y: 0 },
   };
-  window.addEventListener('keyup', (e) => {
-    if (letters.hasOwnProperty(e.key)) {
-      if (direction === letters[e.key]) return; //ignore if we're going that direction
 
-      lastDirection = direction;
+  window.addEventListener('keyup', (e) => {});
 
-      direction = letters[e.key];
-      return;
-    }
+  window.addEventListener('DOMContentLoaded', (e) => {
+    board.style.gridTemplate = `repeat(${grid.getSize()},1fr)/repeat(${grid.getSize()},1fr)`;
   });
 })();
