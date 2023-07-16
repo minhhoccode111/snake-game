@@ -182,7 +182,7 @@ const game = (() => {
 
       if (grid.checkOutside(snake.getHead()) || snake.isOnBody(snake.getHead())) {
         if (window.confirm('Play again?')) {
-          window.location.href = '/';
+          window.location.href = window.location.href;
         }
       }
       if (snake.isOnHead(food.getPosition())) {
