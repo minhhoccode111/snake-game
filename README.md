@@ -1,4 +1,4 @@
-# snakeGame
+# Snake Game
 
 A basic Nokia Snake Game with HTML, CSS, JAVASCRIPT to practice OOP in JAVASCRIPT
 
@@ -11,6 +11,6 @@ A basic Nokia Snake Game with HTML, CSS, JAVASCRIPT to practice OOP in JAVASCRIP
 - object destructuring `const setDirection = ({ x, y }) => {}`
 - `requestAnimationFrame`
 
-[View all my projects Live demo links](https://minhhoccode111.github.io/allProjectssLiveDemo/)
+[View all projects' live demos](https://minhhoccode111.github.io/all-projects-live-demos/) 
 
-[View this project Live demo](https://minhhoccode111.github.io/snakeGame/)
+[Snake Game](https://minhhoccode111.github.io/snake-game/)
